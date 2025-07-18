@@ -1,90 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Admin Panel</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f6f6f6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #0001;
+            padding: 24px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        input,
+        button {
+            margin: 6px 0;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #4a90e2;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button.danger {
+            background: #d00;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-row span {
+            flex: 1;
+        }
+    </style>
+</head>
+
 <body>
-    <h1>Welcome to My Website</h1>
-    <p>This is a simple HTML page.</p>
-    <p>Here is a list of items:</p>
-    <ul>
-        <li>Item 1</li>
-        <li>Item 2</li>
-        <li>Item 3</li>
-    </ul>
-    <p>Here is a table:</p>
-    <table border="1">
-        <tr>
-            <th>Header 1</th>
-            <th>Header 2</th>
-        </tr>
-        <tr>
-            <td>Row 1, Cell 1</td>
-            <td>Row 1, Cell 2</td>
-        </tr>
-        <tr>
-            <td>Row 2, Cell 1</td>
-            <td>Row 2, Cell 2</td>
-        </tr>
-    </table>
-    <p>Here is a link to <a href="https://www.example.com">Example</a>.</p>
-    <p>Here is an image:</p>
-    <img src="https://via.placeholder.com/150" alt="Placeholder Image">
-    <p>Here is a block of code:</p>
-    <pre>
-        <code>
-            function helloWorld() {
-                console.log("Hello, World!");
-            }
-        </code>
-    </pre>
-    <p>Here is a form:</p>
-    <form action="/submit" method="post">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name"><br><br>
-        <input type="submit" value="Submit">
-    </form>
-    <p>Here is a video:</p>
-    <video width="320" height="240" controls>
-        <source src="movie.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-    <p>Here is an audio file:</p>
-    <audio controls>
-        <source src="audio.mp3" type="audio/mpeg">
-        Your browser does not support the audio tag.
-    </audio>
-    <p>Here is a blockquote:</p>
-    <blockquote>
-        <p>This is a blockquote. It is used to quote text from another source.</p>
-    </blockquote>
-    <p>Here is a horizontal rule:</p>
-    <hr>
-    <p>Here is a definition list:</p>
-    <dl>
-        <dt>HTML</dt>
-        <dd>HyperText Markup Language</dd>
-        <dt>CSS</dt>
-        <dd>Cascading Style Sheets</dd>
-        <dt>JavaScript</dt>
-        <dd>A programming language for web development</dd>
-    </dl>
-    <p>Here is a summary list:</p>
-    <summary>
-        <details>
-            <summary>Details</summary>
-            <p>This is a summary of the details.</p>
-        </details>
-    </summary>
-    <p>Here is a navigation menu:</p>
-    <nav>
-        <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
-    <p>Here is a script:</p>
+    <div class="container">
+        <h2>User Admin Panel</h2>
+        <form id="addUserForm">
+            <input id="newUsername" placeholder="Username" required pattern="[a-zA-Z0-9._-]+" />
+            <input id="newPassword" placeholder="Password" type="password" required />
+            <button type="submit">Add User</button>
+        </form>
+        <h3>Users</h3>
+        <ul id="userList"></ul>
+    </div>
     <script>
-        console.log("This is a script.");
-        alert("Hello, World!");
+        async function fetchUsers() {
+            const res = await fetch('/api/admin-users');
+            const users = await res.json();
+            const list = document.getElementById('userList');
+            list.innerHTML = '';
+            users.forEach(u => {
+                const li = document.createElement('li');
+                li.innerHTML = `<div class='user-row'><span>${u.username}</span><button class='danger' onclick="deleteUser('${u.username}')">Delete</button></div>`;
+                list.appendChild(li);
+            });
+        }
+        async function addUser(e) {
+            e.preventDefault();
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+            await fetch('/api/admin-users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            document.getElementById('addUserForm').reset();
+            fetchUsers();
+        }
+        async function deleteUser(username) {
+            await fetch('/api/admin-users', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            });
+            fetchUsers();
+        }
+        document.getElementById('addUserForm').addEventListener('submit', addUser);
+        fetchUsers();
     </script>
-    <p> this is a button: </p>
-    <button onclick="alert('Button clicked!')">Click Me!</button>
-    
 </body>
+
+</html>
