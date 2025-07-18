@@ -78,7 +78,7 @@
     </div>
     <script>
         async function fetchUsers() {
-            const res = await fetch('/api/admin-users');
+            const res = await fetch('/users');
             const users = await res.json();
             const list = document.getElementById('userList');
             list.innerHTML = '';
@@ -92,7 +92,7 @@
             e.preventDefault();
             const username = document.getElementById('newUsername').value;
             const password = document.getElementById('newPassword').value;
-            await fetch('/api/admin-users', {
+            await fetch('/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
@@ -101,7 +101,7 @@
             fetchUsers();
         }
         async function deleteUser(username) {
-            await fetch('/api/admin-users', {
+            await fetch('/users', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username })
